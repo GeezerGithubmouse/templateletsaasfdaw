@@ -1,0 +1,31 @@
+name: Auto Merge CF IPs
+
+on:
+  schedule:
+    # 每天 UTC 时间 0 点（北京时间 8 点）自动运行一次
+    - cron: '0 0 * * *'
+  # 支持手动在网页点按钮触发运行
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出仓库代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: 运行合并脚本
+        run: python merge.py
+
+      - name: 提交更新后的 ip.txt 到仓库
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add ip.txt
+          git commit -m "Auto update CF IPs" || exit 0
+          git push
