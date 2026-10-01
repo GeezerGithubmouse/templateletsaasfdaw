@@ -45,8 +45,9 @@ req_headers = {'User-Agent': 'Mozilla/5.0'}
 
 for url in urls:
     try:
+        # 修改点 1：将超时从 8 秒缩减到 4 秒，遇到坏源迅速跳过，加快运行速度
         req = urllib.request.Request(url, headers=req_headers)
-        with urllib.request.urlopen(req, timeout=8) as response:
+        with urllib.request.urlopen(req, timeout=4) as response:
             lines = response.read().decode('utf-8', errors='ignore').splitlines()
             for line in lines:
                 line = line.strip()
@@ -56,6 +57,9 @@ for url in urls:
     except Exception:
         pass
 
+# 修改点 2：按字典序排序后，仅截取前 200 个优质/最新的 IP
+sorted_ips = sorted(all_ips)[:200]
+
 with open("ip.txt", "w", encoding="utf-8") as f:
-    for ip in sorted(all_ips):
+    for ip in sorted_ips:
         f.write(ip + "\n")
